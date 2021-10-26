@@ -1,0 +1,112 @@
+import pandas as pd
+pd.plotting.register_matplotlib_converters()
+import matplotlib.pyplot as plt
+%matplotlib inline
+import seaborn as sns
+import numpy as np
+print('Libraries Imported.')
+
+#change to your own filepath. Make sure it is the CSV filepath.
+accidents_filepath = '../input/us-highway-railgrade-crossing-accident/Highway-Rail_Grade_Crossing_Accident_Data.csv'
+
+accidents_data = pd.read_csv(accidents_filepath)
+
+a_df= pd.DataFrame(accidents_data)
+
+
+#separating the data into small chunks to get individual data bits out, smaller
+#DataFrames creating easier data to work with and sometimes only for compatibility
+#with the plot/chart.
+numberofa = pd.DataFrame(a_df['Report Year'].value_counts())
+acc_by_state = pd.DataFrame(a_df['State Name'].value_counts())
+monthlyacc = pd.Series(a_df['Month'].value_counts())
+weatherconditions = pd.DataFrame(a_df['Weather Condition'].value_counts())
+struck_or_struckBy = pd.Series(a_df['Equipment Struck'].value_counts())
+
+#Creates a table corresponding to the weather codes. Uses DataFrame for this.
+#Defined so early because the 2D KDE plot uses the condition code maker for its legend.
+#also will be followed with a visicodemaker in order to classify the visibility codes.
+
+def condCodeMaker():   
+    condcode = pd.DataFrame({'Code': [1,2,3,4,5,6], 'Condition': 
+                             ['Clear','Cloudy','Rain','Snow','Fog','Sleet']})
+    return(condcode.set_index('Code'))
+
+def visiCodeMaker():  
+    visiCode = pd.DataFrame({'Code': [1,2,3,4], 'Visibility': ['Dawn','Day','Dusk','Dark']})
+    return(visiCode.set_index('Code'))    
+#function to print the line graph of accidents per year with the given titles and axis
+#labels
+def railroad_by_year():
+    plt.figure(figsize = (20, 12))
+    plt.title('Railroad Accidents Through The Years')
+    plt.xlabel('Report Year')
+    plt.ylabel('Reported Accidents')
+    return sns.lineplot(data = numberofa)
+
+#function to create a heatmap of where the data is the most concentrated, in terms of states.
+def accidents_by_states():
+    plt.figure(figsize = (20,13))
+    plt.title('Accidents by State')
+    return sns.heatmap(data = acc_by_state, annot = False)
+
+#function to create a scatter plot that relates the number of accidents to the month.
+def monthlyaccidents():
+    plt.figure(figsize = (20, 12))
+    plt.title('How Month Affects Train Accidents')
+    plt.xlabel('Month')
+    plt.ylabel('Accidents')
+    return sns.scatterplot(x = accidents_data['Month'], y = monthlyacc)
+    
+#function that creates a heatmap of the most occuring weather conditions.
+def weathercondiions():
+    plt.figure(figsize = (20, 12))
+    plt.title('The Occurrence of Weather')
+    return sns.heatmap(data = weatherconditions, annot = False)
+    
+#function that creates the distribution of accidents based on the months in
+#which they occured.
+def accbyDay():
+    plt.figure(figsize = (20, 12))
+    plt.title('The Distribution of Accidents Across the Month')
+    plt.xlabel('Day')
+    plt.ylabel('Accidents')
+    return sns.distplot(a = accidents_data['Day'], kde = True)
+    
+#displays probability density of the accidents given a day of the month.
+def accbyDayKde():
+    plt.figure(figsize = (14, 6))
+    plt.title('Probability of an Accident On a Given Day.')
+    plt.xlabel('Day')
+    plt.ylabel('Accident Probability')
+    return sns.kdeplot(data = accidents_data['Day'], shade = True)
+
+#I don't know if I will use this one, may be redundant data. Will consider.
+
+
+#jointplot of the chances that it will be a certain visibililty and a certain weather
+#condition. Codes must be supplied from the concodemaker function below. THIS TAKES A
+#WHILE TO PLOT. AS IN 6-10 MINUTES (unmeasured but it feels so long)
+def visByCode():
+    plt.figure(figsize = (20, 12))
+    return sns.jointplot(x = accidents_data['Visibility Code'], 
+                  y = accidents_data['Weather Condition Code'],kind = "kde")
+    
+    
+def weathercc():
+    plt.figure(figsize = (15, 10))
+    plt.title('Distribution of Accidents According to Weather Codes.')
+    plt.xlabel('Code')
+    plt.ylabel('Density')
+    return sns.distplot(a = accidents_data['Weather Condition Code'], kde = True)
+
+def visiCode():
+    plt.figure(figsize = (15, 10))
+    plt.title('Accidents By The Time of Day')
+    return sns.distplot(a = accidents_data['Visibility Code'], kde = True)
+
+
+#to do: add ratios of accidents by car hitting train and train hitting car, maybe factors (?)
+#add the railroad companies that have the most accidents. and the stations
+#that have the most accidents,but make sure that there are not too many data values.
+#maybe big 5-10 railroad companies, well established ones.
