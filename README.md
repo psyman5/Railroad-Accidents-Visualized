@@ -1,4 +1,4 @@
 # Railroad-Accidents-Visualized
-My Public Speaking speech code in order to produce the graphs. Requires data from https://www.kaggle.com/yogidsba/us-highway-railgrade-crossing-accident
-You need to use data in the URL because that is the data that you need, simple as that.
-I will work on making a general data printer though that is most likely impossible. Perhaps machine learning for the trends? I don't know.
+A program/repository to print and visualize data that I used for my Fall 2021 Public Speaking Course.
+Requires data from https://www.kaggle.com/yogidsba/us-highway-railgrade-crossing-accident
+Will not use any other data successfully.
